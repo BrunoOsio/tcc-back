@@ -21,7 +21,7 @@ export class Task {
   @ManyToOne(
     () => ColumnList,
     column => column.tasks,
-    // { onDelete: "SET NULL"}
+    { onDelete: "CASCADE"}
   )
   column: ColumnList
 

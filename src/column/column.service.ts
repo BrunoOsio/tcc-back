@@ -8,6 +8,10 @@ import { ColumnList } from './entities/column.entity';
 @Injectable()
 export class ColumnService {
 
+  private readonly COLUMN_RELATIONS = { relations: {
+
+  } };
+
   constructor(
     @InjectRepository(ColumnList) 
     private readonly columnRepository: Repository<ColumnList>,
@@ -22,20 +26,22 @@ export class ColumnService {
   }
 
   async findAll(): Promise<ColumnList[]> {
-    const columns = await this.columnRepository.find();
+    const columns = await this.columnRepository.find(this.COLUMN_RELATIONS);
     
     return columns;
   }
 
   async findById(id: number): Promise<ColumnList> {
-    const column = await this.columnRepository.findOneByOrFail({id});
+    const column = await this.columnRepository.findOneOrFail({where: {id}, ...this.COLUMN_RELATIONS});
 
     return column;
   }
 
-  async update(id: number, updateColumnDto: UpdateColumnDto) {
+  async update(id: number, updateColumnDto: UpdateColumnDto): Promise<ColumnList> {
     await this.columnRepository.update(id, updateColumnDto);
 
+    console.log(updateColumnDto);
+    
     const updatedColumn = await this.findById(id);
 
     return updatedColumn;
