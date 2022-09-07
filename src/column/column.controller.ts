@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ColumnService } from './column.service';
 import { CreateColumnDto } from './dto/create-column.dto';
+import { ReorderColumnsDto } from './dto/reorder-columns.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 
 @Controller('columns')
@@ -20,6 +21,11 @@ export class ColumnController {
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.columnService.findById(+id);
+  }
+
+  @Patch('reorder')
+  reorder(@Body() reorderColumnsDto: ReorderColumnsDto) {
+    return this.columnService.reorder(reorderColumnsDto);
   }
 
   @Patch(':id')
