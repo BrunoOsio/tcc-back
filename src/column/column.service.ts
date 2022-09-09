@@ -18,6 +18,10 @@ export class ColumnService {
     private readonly columnRepository: Repository<ColumnList>,
   ) {}
 
+  async testServer() {
+    return {data: "hello world"}
+  }
+
   async create(createColumnDto: CreateColumnDto): Promise<ColumnList> {
     const newColumn = this.columnRepository.create(createColumnDto);
 
@@ -46,6 +50,7 @@ export class ColumnService {
     return updatedColumn;
   }
 
+  //TODO URGENT not persisting data when updating tables
   async reorder(columnsOrderResult: ColumnsOrderResult): Promise<ColumnList[]> {
     const {sourceColumn: source, destinationColumn: destination} = columnsOrderResult;
 
@@ -64,13 +69,13 @@ export class ColumnService {
     return [newSourceColumn, newDestinationColumn];
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     const column = await this.findById(id);
 
     await this.columnRepository.remove(column);
   }
 
-  async removeAll() {
+  async removeAll(): Promise<void> {
     const allColumns = await this.findAll();
 
     await this.columnRepository.remove(allColumns);

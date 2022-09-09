@@ -8,6 +8,11 @@ import { UpdateColumnDto } from './dto/update-column.dto';
 export class ColumnController {
   constructor(private readonly columnService: ColumnService) {}
 
+  @Get('ola/testServer')
+  testServer() {
+    return this.columnService.testServer();
+  }
+
   @Post()
   create(@Body() createColumnDto: CreateColumnDto) {
     return this.columnService.create(createColumnDto);
