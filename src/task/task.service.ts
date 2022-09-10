@@ -1,27 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ColumnService } from '../column/column.service';
 import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
-import { formatTaskIdsOrderWhenTaskCreated } from '../column/helpers/formatTaskIdsOrder.helpers';
+import { destructTaskIdsToArray, formatTaskIdsOrderToString, formatTaskIdsOrderWhenTaskCreated } from '../column/helpers/TaskIds.helpers';
 
 @Injectable()
 export class TaskService {
 
-  private readonly TASK_RELATIONS = {
+  private readonly RELATIONS = {
     relations: {
       column: true,
     },
   };
 
-  private readonly TASK_RELATIONS_NO_COLUMNS = { relations: {} };
+  private readonly NO_RELATIONS = { relations: {} };
 
   constructor(
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
 
+    @Inject(forwardRef(() => ColumnService))
     private readonly columnService: ColumnService,
   ) {}
 
@@ -41,7 +42,7 @@ export class TaskService {
   }
 
   async findAll(): Promise<Task[]> {
-    const tasks = await this.taskRepository.find(this.TASK_RELATIONS);
+    const tasks = await this.taskRepository.find(this.RELATIONS);
 
     return tasks;
   }
@@ -52,10 +53,12 @@ export class TaskService {
     return tasks;
   }
 
-  async findById(id: number): Promise<Task> {
+  async findById(id: number, relations = false): Promise<Task> {
+    const taskRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
+
     const task = await this.taskRepository.findOneOrFail({
       where: { id },
-      ...this.TASK_RELATIONS,
+      ...taskRelations,
     });
 
     return task;
@@ -82,15 +85,26 @@ export class TaskService {
       const column = await this.columnService.findById(columnId);
 
       updatedTask.column = column;
+      await this.taskRepository.update(id, updatedTask);
     }
 
     return updatedTask;
   }
 
-  async remove(id: number): Promise<void> {
-    const task = await this.findById(id);
-
+  async remove(taskId: number): Promise<void> {
+    const task = await this.findById(taskId, true);
     await this.taskRepository.remove(task);
+
+    const column = task.column;
+
+    const taskIds = destructTaskIdsToArray(column.taskIdsOrder);
+    taskIds.splice(taskIds.indexOf(taskId), 1);
+
+    const formattedTaskIds = formatTaskIdsOrderToString(taskIds);
+
+    column.taskIdsOrder = formattedTaskIds;
+
+    await this.columnService.update(column.id, column);
   }
 
   async removeAll(): Promise<void> {

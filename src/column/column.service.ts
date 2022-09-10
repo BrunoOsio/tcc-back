@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TaskService } from '../task/task.service';
 import { Repository } from 'typeorm';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
@@ -9,13 +10,19 @@ import { ColumnsOrderResult } from './types/ColumnsOrderResult';
 @Injectable()
 export class ColumnService {
 
-  private readonly COLUMN_RELATIONS = { relations: {
+  private readonly NO_RELATIONS = { relations: {
 
+  } };
+
+  private readonly RELATIONS = { relations: {
   } };
 
   constructor(
     @InjectRepository(ColumnList) 
     private readonly columnRepository: Repository<ColumnList>,
+
+    @Inject(forwardRef(() => TaskService))
+    private readonly taskService: TaskService,
   ) {}
 
   async testServer() {
@@ -31,13 +38,14 @@ export class ColumnService {
   }
 
   async findAll(): Promise<ColumnList[]> {
-    const columns = await this.columnRepository.find(this.COLUMN_RELATIONS);
+    const columns = await this.columnRepository.find(this.NO_RELATIONS);
     
     return columns;
   }
 
-  async findById(id: number): Promise<ColumnList> {
-    const column = await this.columnRepository.findOneOrFail({where: {id}, ...this.COLUMN_RELATIONS});
+  async findById(id: number, relations = false): Promise<ColumnList> {
+    const columnRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
+    const column = await this.columnRepository.findOneOrFail({where: {id}, ...columnRelations});
 
     return column;
   }
@@ -50,9 +58,9 @@ export class ColumnService {
     return updatedColumn;
   }
 
-  //TODO URGENT not persisting data when updating tables
-  async reorder(columnsOrderResult: ColumnsOrderResult): Promise<ColumnList[]> {
-    const {sourceColumn: source, destinationColumn: destination} = columnsOrderResult;
+  //!URGENT! not persisting data when updating tables
+  async reorder(columnsOrderResult: ColumnsOrderResult): Promise<object[]> {
+    const {taskId, sourceColumn: source, destinationColumn: destination} = columnsOrderResult;
 
     const sourceColumn = await this.findById(source.id);
     sourceColumn.taskIdsOrder = source.taskIdsOrder;
@@ -63,10 +71,14 @@ export class ColumnService {
     await this.update(sourceColumn.id, sourceColumn);
     await this.update(destinationColumn.id, destinationColumn);
 
+    const task = await this.taskService.findById(taskId);
+    await this.taskService.update(task.id, task, destinationColumn.id);
+    
     const newSourceColumn = await this.findById(source.id);
     const newDestinationColumn = await this.findById(destination.id);
+    const newTask = await this.taskService.findById(task.id);
 
-    return [newSourceColumn, newDestinationColumn];
+    return [newSourceColumn, newDestinationColumn, newTask];
   }
 
   async remove(id: number): Promise<void> {

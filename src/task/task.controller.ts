@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { ColumnTypeUndefinedError } from 'typeorm';
 
 @Controller('tasks')
 export class TaskController {
@@ -39,7 +40,7 @@ export class TaskController {
   update(
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
-    @Query("columnId") columnId?: number
+    @Query("columnId") columnId: number
   ) {
     return this.taskService.update(+id, updateTaskDto, columnId);
   }

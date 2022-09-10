@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Query } from 'typeorm/driver/Query';
 import { ColumnService } from './column.service';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { ReorderColumnsDto } from './dto/reorder-columns.dto';

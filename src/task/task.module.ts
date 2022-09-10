@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TaskController } from './task.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,9 +8,10 @@ import { ColumnModule } from '../column/column.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Task]),
-    ColumnModule
+    forwardRef(() => ColumnModule),
   ],
   controllers: [TaskController],
-  providers: [TaskService]
+  providers: [TaskService],
+  exports: [TaskService]
 })
 export class TaskModule {}
