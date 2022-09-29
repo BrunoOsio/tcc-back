@@ -26,6 +26,11 @@ export class TaskController {
     return this.taskService.findAllRaw();
   }
 
+  @Get('biggestId')
+  findBiggestId() {
+    return this.taskService.findBiggestId();
+  }
+
   @Get('find')
   findByColumnId(@Query('columnId') columnId: string) {
     return this.taskService.findByColumnId(+columnId);

@@ -3,7 +3,7 @@ import { SqliteConnectionOptions } from "typeorm/driver/sqlite/SqliteConnectionO
 const config: SqliteConnectionOptions = {
         "type": "sqlite",
         "database": "db.sqlite3",
-        "synchronize": false,
+        "synchronize": true,
         logging: true,
         "entities": ["dist/src/**/*.entity{.js, .ts}"],
 }

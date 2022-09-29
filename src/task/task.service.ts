@@ -1,11 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ColumnService } from '../column/column.service';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 import { destructTaskIdsToArray, formatTaskIdsOrderToString, formatTaskIdsOrderWhenTaskCreated } from '../column/helpers/TaskIds.helpers';
+import { Max } from 'class-validator';
 
 @Injectable()
 export class TaskService {
@@ -51,6 +52,17 @@ export class TaskService {
     const tasks = await this.taskRepository.find();
 
     return tasks;
+  }
+
+  async findBiggestId(): Promise<number> {
+    let biggestId = 1;
+    const tasks = await this.findAll();
+    
+    tasks.forEach(task => {
+      if(task.id > biggestId) biggestId = task.id;
+    });
+
+    return biggestId;
   }
 
   async findById(id: number, relations = false): Promise<Task> {
