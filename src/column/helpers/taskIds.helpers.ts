@@ -1,10 +1,10 @@
 const TASK_ORDER_SEPARATOR = ' ';
 export const formatTaskIdsOrderWhenTaskCreated = (taskIdsOrder: string | undefined, newTaskId: number): string => {
-  const newTaskIdsOrder = String(TASK_ORDER_SEPARATOR + newTaskId);
+  const newTask = String(newTaskId + TASK_ORDER_SEPARATOR);
 
   const order = !taskIdsOrder
-    ? newTaskIdsOrder.trim()
-    : taskIdsOrder.concat(newTaskIdsOrder).trim();
+    ? newTask.trim()
+    : newTask.concat(taskIdsOrder).trim();
   
   return order;
 }

@@ -54,8 +54,9 @@ export class TaskService {
     return tasks;
   }
 
+  //!URGERT! reorder the first ever task gives a draggable-id = 1
   async findBiggestId(): Promise<number> {
-    let biggestId = 1;
+    let biggestId = 0;
     const tasks = await this.findAll();
     
     tasks.forEach(task => {
