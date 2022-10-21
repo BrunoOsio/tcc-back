@@ -1,12 +1,11 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ColumnService } from '../column/column.service';
-import { IsNull, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 import { destructTaskIdsToArray, formatTaskIdsOrderToString, formatTaskIdsOrderWhenTaskCreated } from '../column/helpers/TaskIds.helpers';
-import { Max } from 'class-validator';
 
 @Injectable()
 export class TaskService {

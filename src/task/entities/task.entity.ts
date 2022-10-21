@@ -15,7 +15,7 @@ export class Task {
   @Column()
   createdAt: string;
 
-  @Column()
+  @Column({nullable: true})
   limitAt: string;
 
   @ManyToOne(
