@@ -6,6 +6,7 @@ import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 import { ColumnList } from './entities/column.entity';
 import { ColumnsOrderResult } from './types/ColumnsOrderResult';
+import { AreaService } from '../area/area.service';
 
 @Injectable()
 export class ColumnService {
@@ -23,14 +24,20 @@ export class ColumnService {
 
     @Inject(forwardRef(() => TaskService))
     private readonly taskService: TaskService,
+
+    @Inject(forwardRef(() => AreaService))
+    private readonly areaService: AreaService,
   ) {}
 
   async testServer() {
     return {data: "hello world"}
   }
 
-  async create(createColumnDto: CreateColumnDto): Promise<ColumnList> {
+  async create(createColumnDto: CreateColumnDto, areaId: number): Promise<ColumnList> {
     const newColumn = this.columnRepository.create(createColumnDto);
+
+    const area = await this.areaService.findById(areaId);
+    newColumn.area = area;
 
     await this.columnRepository.save(newColumn);
 
@@ -48,6 +55,12 @@ export class ColumnService {
     const column = await this.columnRepository.findOneOrFail({where: {id}, ...columnRelations});
 
     return column;
+  }
+
+  async findByArea(areaId: number): Promise<ColumnList[]> {
+    const area = await this.areaService.findById(areaId);
+
+    return area.columns;
   }
 
   async update(id: number, updateColumnDto: UpdateColumnDto): Promise<ColumnList> {

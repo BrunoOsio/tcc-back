@@ -1,5 +1,6 @@
 import { Task } from "../../task/entities/task.entity";
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Area } from "../../area/entities/area.entity";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class ColumnList {
@@ -22,5 +23,10 @@ export class ColumnList {
   )
   tasks: Task[];
 
-  //TODO: area
+  @ManyToOne(
+    () => Area,
+    area => area.columns,
+    { onDelete: "CASCADE"}
+  )
+  area: Area
 }

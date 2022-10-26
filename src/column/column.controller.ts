@@ -1,5 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { Query } from 'typeorm/driver/Query';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ColumnService } from './column.service';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { ReorderColumnsDto } from './dto/reorder-columns.dto';
@@ -9,14 +8,17 @@ import { UpdateColumnDto } from './dto/update-column.dto';
 export class ColumnController {
   constructor(private readonly columnService: ColumnService) {}
 
-  @Get('ola/testServer')
+  @Get('testServer')
   testServer() {
     return this.columnService.testServer();
   }
 
   @Post()
-  create(@Body() createColumnDto: CreateColumnDto) {
-    return this.columnService.create(createColumnDto);
+  create(
+    @Body() createColumnDto: CreateColumnDto,
+    @Query("areaId") areaId: number
+  ) {
+    return this.columnService.create(createColumnDto, areaId);
   }
 
   @Get()
@@ -27,6 +29,11 @@ export class ColumnController {
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.columnService.findById(+id);
+  }
+
+  @Get('ofArea/:areaId')
+  findByArea(@Param('areaId') id: string) {
+    return this.columnService.findByArea(+id);
   }
 
   @Patch('reorder')
