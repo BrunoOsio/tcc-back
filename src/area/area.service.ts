@@ -1,10 +1,10 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ColumnService } from '../column/column.service';
 import { Repository } from 'typeorm';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
 import { Area } from './entities/area.entity';
+import { TeamService } from '../team/team.service';
 
 @Injectable()
 export class AreaService {
@@ -21,13 +21,16 @@ export class AreaService {
     @InjectRepository(Area) 
     private readonly areaRepository: Repository<Area>,
 
-    @Inject(forwardRef(() => ColumnService))
-    private readonly columnService: ColumnService,
+    @Inject(forwardRef(() => TeamService))
+    private readonly teamService: TeamService,
   ) {}
 
-  async create(createAreaDto: CreateAreaDto): Promise<Area> {
+  async create(createAreaDto: CreateAreaDto, teamId: number): Promise<Area> {
 
     const newArea = this.areaRepository.create(createAreaDto);
+
+    const team = await this.teamService.findById(teamId);
+    newArea.team = team;
 
     await this.areaRepository.save(newArea);
 
