@@ -63,6 +63,17 @@ export class ColumnService {
     return area.columns;
   }
 
+  async findBiggestId(): Promise<number> {
+    let biggestId = 0;
+    const columns = await this.findAll();
+    
+    columns.forEach(task => {
+      if(task.id > biggestId) biggestId = task.id;
+    });
+
+    return biggestId;
+  }
+
   async update(id: number, updateColumnDto: UpdateColumnDto): Promise<ColumnList> {
     await this.columnRepository.update(id, updateColumnDto);
     
@@ -71,7 +82,6 @@ export class ColumnService {
     return updatedColumn;
   }
 
-  //!URGENT! not persisting data when updating tables
   async reorder(columnsOrderResult: ColumnsOrderResult): Promise<object[]> {
     const {taskId, sourceColumn: source, destinationColumn: destination} = columnsOrderResult;
 

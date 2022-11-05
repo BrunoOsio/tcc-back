@@ -26,6 +26,11 @@ export class ColumnController {
     return this.columnService.findAll();
   }
 
+  @Get('biggestId')
+  findBiggestId() {
+    return this.columnService.findBiggestId();
+  }
+
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.columnService.findById(+id);
