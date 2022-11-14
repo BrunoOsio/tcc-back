@@ -50,6 +50,12 @@ export class AreaService {
     return area;
   }
 
+  async findByTeam(teamId: number): Promise<Area[]> {
+    const team = await this.teamService.findById(teamId);
+    console.log(team);
+    return team.areas;
+  }
+
   async update(id: number, updateAreaDto: UpdateAreaDto): Promise<Area> {
     await this.areaRepository.update(id, updateAreaDto);
     

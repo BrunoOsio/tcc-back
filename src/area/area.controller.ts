@@ -21,8 +21,13 @@ export class AreaController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findById(@Param('id') id: string) {
     return this.areaService.findById(+id);
+  }
+
+  @Get('ofTeam/:teamId')
+  findByTeam(@Param('teamId') id: string) {
+    return this.areaService.findByTeam(+id);
   }
 
   @Patch(':id')

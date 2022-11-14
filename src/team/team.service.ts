@@ -36,7 +36,7 @@ export class TeamService {
     return teams;  
   }
 
-  async findById(id: number, relations=false): Promise<Team> {
+  async findById(id: number, relations=true): Promise<Team> {
     const teamRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
     const team = await this.teamRepository.findOneOrFail({where: {id}, ...teamRelations});
 
