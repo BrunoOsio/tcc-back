@@ -4,6 +4,7 @@ import { ColumnModule } from './column/column.module';
 import { TaskModule } from './task/task.module';
 import { AreaModule } from './area/area.module';
 import { TeamModule } from './team/team.module';
+import { UserModule } from './user/user.module';
 import config from "../ormconfig";
 
 @Module({
@@ -11,7 +12,7 @@ import config from "../ormconfig";
     TypeOrmModule.forRoot(config),
     ColumnModule, 
     TaskModule, 
-    AreaModule, TeamModule
+    AreaModule, TeamModule, UserModule
   ],
   controllers: [],
   providers: [],

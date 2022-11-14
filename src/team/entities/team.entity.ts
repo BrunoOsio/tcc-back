@@ -1,5 +1,6 @@
 import { Area } from "../../area/entities/area.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "../../user/entities/user.entity";
 
 @Entity()
 export class Team {
@@ -18,5 +19,12 @@ export class Team {
     { onDelete: "CASCADE"}
   )
   areas: Area[];
+
+  @ManyToMany(
+    () => User,
+    user => user.teams,
+    //{ onDelete: "CASCADE"}
+  )
+  members: User[];
 }
 
