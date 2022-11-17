@@ -12,7 +12,7 @@ export class TeamService {
   private readonly RELATIONS = {
     relations: {
       areas: true,
-      users: true,
+      //users: true,
     },
   };
 

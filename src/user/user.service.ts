@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { compareValues, hash } from '../shared/helpers/bcrypt.helpers';
+import { UserLoginDto } from './dto/user-login.dto';
 
 @Injectable()
 export class UserService {
@@ -25,12 +27,29 @@ export class UserService {
     private readonly teamService: TeamService,
   ) {}
 
-  //!URGENT!: CRIPTOGRAFAR SENHA
   async create(createUserDto: CreateUserDto): Promise<User> {
     const newUser = this.userRepository.create(createUserDto);
+    newUser.password = await hash(newUser.password);
+
     await this.userRepository.save(newUser);
 
     return newUser;
+  }
+
+  async checkLogin(userLoginDto: UserLoginDto): Promise<User> {
+    let userLogin: User = null;
+
+    const user = await this.findByEmail(userLoginDto.email);
+
+    if (user) {
+      const { password: hashedPassword } = user;
+      
+      const isPasswordEquals = await compareValues(userLoginDto.password, hashedPassword);
+      if (isPasswordEquals)
+        userLogin = user;
+    }
+    
+    return userLogin;
   }
 
   async findAll(): Promise<User[]> {
@@ -43,6 +62,16 @@ export class UserService {
     const userRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
     const user = await this.userRepository.findOneOrFail({
       where: { id },
+      ...userRelations,
+    });
+
+    return user;  
+  }
+
+  async findByEmail(email: string, relations=true): Promise<User> {
+    const userRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
+    const user = await this.userRepository.findOne({
+      where: { email },
       ...userRelations,
     });
 

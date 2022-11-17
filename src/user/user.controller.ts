@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserLoginDto } from './dto/user-login.dto';
 
 @Controller('users')
 export class UserController {
@@ -12,9 +13,20 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Post("checkLogin")
+  checkLogin(@Body() userLoginDto: UserLoginDto) {
+    console.log("TESTEEEEEE")
+    return this.userService.checkLogin(userLoginDto);
+  }
+
   @Get()
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Get("search")
+  findByEmail(@Query('email') email: string) {
+    return this.userService.findByEmail(email);
   }
 
   @Get(':id')
