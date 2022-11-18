@@ -1,5 +1,5 @@
 import { Area } from "../../area/entities/area.entity";
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
 
 @Entity()
@@ -25,6 +25,7 @@ export class Team {
     user => user.teams,
     //{ onDelete: "CASCADE"}
   )
+  @JoinTable({name:"team-joined-user"})
   members: User[];
 }
 

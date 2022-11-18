@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserService } from '../user/user.service';
 import { Repository } from 'typeorm';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
@@ -12,16 +13,18 @@ export class TeamService {
   private readonly RELATIONS = {
     relations: {
       areas: true,
-      //users: true,
+      members: true,
     },
   };
 
   constructor(
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
 
-  async create(createTeamDto: CreateTeamDto): Promise<Team> {
+  async create(createTeamDto: CreateTeamDto, userId: number): Promise<Team> {
     const newTeam = this.teamRepository.create(createTeamDto);
 
     await this.teamRepository.save(newTeam);
@@ -29,8 +32,24 @@ export class TeamService {
     return newTeam;
   }
 
+  async addMember(teamId: number, userId: number): Promise<Team> {
+    const team = await this.findById(teamId);
+    const newMember = await this.userService.findById(userId);
+    team.members.push(newMember);
+
+    await this.teamRepository.save(team);
+
+    return team;
+  }
+
   async findAll(): Promise<Team[]> {
     const teams = await this.teamRepository.find(this.NO_RELATIONS);
+
+    return teams;
+  }
+
+  async findTeamsByUser(userId: number): Promise<Team[]> {
+    const teams = this.teamRepository.findBy({members: {id: userId}});
 
     return teams;
   }

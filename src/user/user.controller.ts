@@ -15,7 +15,6 @@ export class UserController {
 
   @Post("checkLogin")
   checkLogin(@Body() userLoginDto: UserLoginDto) {
-    console.log("TESTEEEEEE")
     return this.userService.checkLogin(userLoginDto);
   }
 

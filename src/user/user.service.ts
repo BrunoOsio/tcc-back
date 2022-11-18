@@ -16,7 +16,7 @@ export class UserService {
   } };
 
   private readonly RELATIONS = { relations: {
-    teams: true
+    teams: false
   } };
 
   constructor(

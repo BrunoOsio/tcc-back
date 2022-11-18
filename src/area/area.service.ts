@@ -52,7 +52,7 @@ export class AreaService {
 
   async findByTeam(teamId: number): Promise<Area[]> {
     const team = await this.teamService.findById(teamId);
-    console.log(team);
+
     return team.areas;
   }
 

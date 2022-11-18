@@ -22,7 +22,6 @@ export class User {
     team => team.members,
     //{ onDelete: "CASCADE"}
   )
-  @JoinTable({name:"team-joined-user"})
   teams: Team[];
 
   //TODO: Photo
