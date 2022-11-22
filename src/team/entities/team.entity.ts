@@ -13,6 +13,9 @@ export class Team {
   @Column({nullable: true})
   number: number;
 
+  @Column()
+  modality: string;
+
   @OneToMany(
     () => Area,
     area => area.team,
@@ -27,5 +30,12 @@ export class Team {
   )
   @JoinTable({name:"team-joined-user"})
   members: User[];
+
+  @ManyToMany(
+    () => User,
+    user => user.teamsLeadered,
+    //{ onDelete: "CASCADE"}
+  )
+  leaders: User[]
 }
 

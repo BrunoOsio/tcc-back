@@ -14,6 +14,7 @@ export class TeamService {
     relations: {
       areas: true,
       members: true,
+      leaders: true
     },
   };
 
@@ -26,6 +27,9 @@ export class TeamService {
 
   async create(createTeamDto: CreateTeamDto, userId: number): Promise<Team> {
     const newTeam = this.teamRepository.create(createTeamDto);
+    const leader = await this.userService.findById(userId);
+    newTeam.members = [leader];
+    newTeam.leaders = [leader];
 
     await this.teamRepository.save(newTeam);
 

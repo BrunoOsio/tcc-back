@@ -24,6 +24,13 @@ export class User {
   )
   teams: Team[];
 
+  @ManyToMany(
+    () => Team,
+    team => team.leaders,
+    //{ onDelete: "CASCADE"}
+  )
+  @JoinTable({name:"user-leaders-team"})
+  teamsLeadered: Team[];
   //TODO: Photo
   //TODO: join requests
 }
