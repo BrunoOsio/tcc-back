@@ -10,7 +10,7 @@ export class Team {
   @Column()
   name: string;
 
-  @Column()
+  @Column({nullable: true})
   number: number;
 
   @OneToMany(
