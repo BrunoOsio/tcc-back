@@ -22,6 +22,11 @@ export class TeamController {
     return this.teamService.findTeamsByUser(userId);
   }
 
+  @Get("searchKey")
+  findTeamsByKeyword(@Query("key") key: string) {
+    return this.teamService.findByKeyword(key);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.teamService.findById(+id);
