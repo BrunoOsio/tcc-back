@@ -37,5 +37,12 @@ export class Team {
     //{ onDelete: "CASCADE"}
   )
   leaders: User[]
+
+  @ManyToMany(
+    () => User,
+    user => user.joinRequests,
+    //{ onDelete: "CASCADE"}
+  )
+  joinRequests: User[]
 }
 

@@ -31,7 +31,14 @@ export class User {
   )
   @JoinTable({name:"user-leaders-team"})
   teamsLeadered: Team[];
+
+  @ManyToMany(
+    () => Team,
+    team => team.joinRequests
+  )
+  @JoinTable({name:"user-joinRequests-team"})
+  joinRequests: Team[]
+
   //TODO: Photo
-  //TODO: join requests
 }
 

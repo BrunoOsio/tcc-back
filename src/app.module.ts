@@ -12,7 +12,9 @@ import config from "../ormconfig";
     TypeOrmModule.forRoot(config),
     ColumnModule, 
     TaskModule, 
-    AreaModule, TeamModule, UserModule
+    AreaModule, 
+    TeamModule,
+    UserModule, 
   ],
   controllers: [],
   providers: [],

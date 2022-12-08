@@ -6,18 +6,22 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
 import { isNumber } from "../shared/helpers/string.helpers";
+import { RequestJoinDto } from './dto/request-join.dto';
+
+const NOT_FOUND = -1;
 
 @Injectable()
 export class TeamService {
   private readonly NO_RELATIONS = { relations: {} };
 
-  // private readonly RELATIONS = {
-  //   relations: {
-  //     areas: true,
-  //     members: true,
-  //     leaders: true
-  //   },
-  // };
+  private readonly RELATIONS = {
+    relations: {
+      areas: true,
+      members: true,
+      leaders: true,
+      joinRequests: true
+    },
+  };
 
   constructor(
     @InjectRepository(Team)
@@ -60,11 +64,9 @@ export class TeamService {
   }
 
   async findByKeyword(key: string): Promise<Team[]> {
-    console.log("entrou")
     let teams = [];
 
     if(isNumber(key)) {
-      console.log(isNumber(key))
       const teamNumberMatches = await this.findByNumber(Number(key));
       teams.push(...teamNumberMatches);
     }
@@ -76,32 +78,36 @@ export class TeamService {
   }
 
   async findByNumber(number: number, relations = true): Promise<Team[]> {
-    // const teamRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
+    const teamRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
 
-    const teams = this.teamRepository.findBy({
-      number,
-      // ...teamRelations
+    const teams = await this.teamRepository.find({
+      where: {
+        number
+      },
+      ...teamRelations
     })
 
     return teams;
   } 
 
   async findByIlikeName(name: string, relations = true): Promise<Team[]> {
-    // const teamRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
+    const teamRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
 
-    const teams = this.teamRepository.findBy({
-      name: ILike(`%${name}%`),
-      // ...teamRelations
+    const teams = await this.teamRepository.find({
+      where: {
+        name: ILike(`%${name}%`),
+      },
+      ...teamRelations
     })
 
     return teams;
   } 
 
   async findById(id: number, relations = true): Promise<Team> {
-    // const teamRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
+    const teamRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
     const team = await this.teamRepository.findOneOrFail({
       where: { id },
-      // ...teamRelations,
+      ...teamRelations,
     });
 
     return team;
@@ -113,6 +119,59 @@ export class TeamService {
     const updatedTeam = await this.findById(id);
 
     return updatedTeam;
+  }
+
+  async addJoinRequest(requestJoinDto: RequestJoinDto): Promise<Team> {
+
+    const team = await this.findById(requestJoinDto.teamId);
+
+    const user = await this.userService.findById(requestJoinDto.userId);
+    user.joinRequests = [...user.joinRequests, team];
+
+    const joinRequestsRaw = [...team.joinRequests, user];
+    
+    const newDistinctTeamRequests = [...new Set(joinRequestsRaw.map(user => user))];
+    team.joinRequests = [...newDistinctTeamRequests];
+    
+    await this.teamRepository.save(team);
+    this.userService.save(user);
+
+    const updated = await this.findById(requestJoinDto.teamId);
+
+    return updated;
+  }
+
+  async removeJoinRequest(requestJoinDto: RequestJoinDto): Promise<Team> {
+    const team = await this.findById(requestJoinDto.teamId);
+    const newTeamRequests = [...team.joinRequests];
+    
+    const user = await this.userService.findById(requestJoinDto.userId);
+    const newUserRequests = [...user.joinRequests];
+
+    const targetRemoveUserRequestIndex = team.joinRequests.findIndex((userRequest) => userRequest.id === user.id);
+
+    const isUserFound = targetRemoveUserRequestIndex != NOT_FOUND;
+    if (isUserFound) {
+      newTeamRequests.splice(targetRemoveUserRequestIndex, 1);
+
+      const targetWithdrawTeamToUserRequestsIndex = user.joinRequests.findIndex((teamRequested) => teamRequested.id === team.id);
+
+      const isTeamFound = targetWithdrawTeamToUserRequestsIndex != NOT_FOUND;
+      if (isTeamFound) {
+        newUserRequests.splice(targetWithdrawTeamToUserRequestsIndex, 1);
+      }
+
+    }
+
+    team.joinRequests = [...newTeamRequests];
+    user.joinRequests = [...newUserRequests];
+
+    await this.teamRepository.save(team);
+    await this.userService.save(user);
+    
+    const updated = this.findById(requestJoinDto.teamId);
+
+    return updated; 
   }
 
   async remove(id: number): Promise<void> {

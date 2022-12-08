@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import { RequestJoinDto } from './dto/request-join.dto';
 
 @Controller('teams')
 export class TeamController {
@@ -40,6 +41,16 @@ export class TeamController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto) {
     return this.teamService.update(+id, updateTeamDto);
+  }
+
+  @Put("/:teamId/addRequest/:userId")
+  addJoinRequest(@Param("teamId") teamId: number, @Param("userId") userId: number) {
+    return this.teamService.addJoinRequest({teamId, userId});
+  }
+
+  @Put("/:teamId/removeRequest/:userId")
+  removeJoinRequest(@Param("teamId") teamId: number, @Param("userId") userId: number) {
+    return this.teamService.removeJoinRequest({teamId, userId});
   }
 
   @Delete(':id')

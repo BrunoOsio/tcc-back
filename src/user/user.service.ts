@@ -17,7 +17,8 @@ export class UserService {
 
   private readonly RELATIONS = { relations: {
     teams: true,
-    teamsLeadered: true
+    teamsLeadered: true,
+    joinRequests: true
   } };
 
   constructor(
@@ -77,6 +78,13 @@ export class UserService {
     });
 
     return user;  
+  }
+
+  async save(user: User): Promise<User> {
+    await this.userRepository.save(user);
+    const updated = await this.findById(user.id);
+
+    return updated;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
