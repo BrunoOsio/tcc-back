@@ -8,7 +8,7 @@ export class Area {
   id: number;
 
   @Column()
-  title: string;
+  name: string;
 
   @OneToMany(
     () => ColumnList,
@@ -24,7 +24,8 @@ export class Area {
   )
   team: Team;
 
-  //TODO: specialization
+  @Column()
+  specialization: string;
 
   //TODO: leader
 

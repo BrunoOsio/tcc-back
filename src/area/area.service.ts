@@ -26,7 +26,7 @@ export class AreaService {
   ) {}
 
   async create(createAreaDto: CreateAreaDto, teamId: number): Promise<Area> {
-
+    console.log(createAreaDto);
     const newArea = this.areaRepository.create(createAreaDto);
 
     const team = await this.teamService.findById(teamId);
