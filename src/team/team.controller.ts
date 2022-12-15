@@ -28,6 +28,11 @@ export class TeamController {
     return this.teamService.findByKeyword(key);
   }
 
+  @Get("/:teamId/hasUser/:userId")
+  isUserOnTeam(@Param("userId") userId: string, @Param("teamId") teamId: string) {
+    return this.teamService.isUserOnTeam({userId: Number(userId), teamId: Number(teamId)});
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.teamService.findById(+id);

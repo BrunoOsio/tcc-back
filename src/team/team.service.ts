@@ -7,6 +7,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
 import { isNumber } from "../shared/helpers/string.helpers";
 import { RequestJoinDto } from './dto/request-join.dto';
+import { IsUserOnTeamDto } from './dto/is-user-on-team.dto';
 
 const NOT_FOUND = -1;
 
@@ -64,7 +65,8 @@ export class TeamService {
   }
 
   async findByKeyword(key: string): Promise<Team[]> {
-    let teams = [];
+    const resultsLimit = 8;
+    let teams: Team[] = [];
 
     if(isNumber(key)) {
       const teamNumberMatches = await this.findByNumber(Number(key));
@@ -74,7 +76,9 @@ export class TeamService {
     const teamNameMatches = await this.findByIlikeName(key);
     teams.push(...teamNameMatches);
 
-    return teams;
+    const filteredLimit = teams.filter((_, index) => index < resultsLimit);
+    
+    return filteredLimit;
   }
 
   async findByNumber(number: number, relations = true): Promise<Team[]> {
@@ -102,6 +106,22 @@ export class TeamService {
 
     return teams;
   } 
+
+  async isUserOnTeam(isUserOnTeamDto: IsUserOnTeamDto): Promise<boolean> {
+    let isUserOnTeam = false;
+
+    const {userId, teamId} = isUserOnTeamDto;
+
+    const team = await this.findById(teamId);
+    
+    const isLeader = team.leaders.some(leader => leader.id === userId);
+    const isMember = team.members.some(member => member.id === userId);
+
+    if (isLeader || isMember)
+      isUserOnTeam = true;
+
+    return isUserOnTeam;
+  }
 
   async findById(id: number, relations = true): Promise<Team> {
     const teamRelations = relations ? this.RELATIONS : this.NO_RELATIONS;
