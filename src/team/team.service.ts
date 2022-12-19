@@ -39,6 +39,12 @@ export class TeamService {
 
     await this.teamRepository.save(newTeam);
 
+    const updatedTeam = await this.findById(newTeam.id);
+    leader.teams = [...leader.teams, updatedTeam];
+    leader.teamsLeadered = [...leader.teamsLeadered, updatedTeam];
+
+    await this.userService.save(leader);
+
     return newTeam;
   }
 

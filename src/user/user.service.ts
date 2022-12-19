@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { compareValues, hash } from '../shared/helpers/bcrypt.helpers';
 import { UserLoginDto } from './dto/user-login.dto';
+import { Team } from 'src/team/entities/team.entity';
 
 @Injectable()
 export class UserService {
@@ -78,6 +79,12 @@ export class UserService {
     });
 
     return user;  
+  }
+
+  async findLeaderedTeams(userId: number): Promise<Team[]> {
+    const user = await this.findById(userId);
+    
+    return user.teamsLeadered;
   }
 
   async save(user: User): Promise<User> {

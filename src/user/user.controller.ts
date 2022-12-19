@@ -28,10 +28,16 @@ export class UserController {
     return this.userService.findByEmail(email);
   }
 
+  @Get(":id/teamsLeadered")
+  findLeaderedTeams(@Param("id") userId: string) {
+    return this.userService.findLeaderedTeams(+userId);
+  }
+
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.userService.findById(+id);
   }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
