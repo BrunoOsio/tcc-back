@@ -43,6 +43,11 @@ export class TeamController {
     return this.teamService.addMember(teamId, userId);
   }
 
+  @Put(":teamId/removeMember/:userId")
+  removeMember(@Param("teamId") teamId: number, @Param("userId") userId: number) {
+    return this.teamService.removeMember(teamId, userId);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto) {
     return this.teamService.update(+id, updateTeamDto);
@@ -55,6 +60,16 @@ export class TeamController {
 
   @Put("/:teamId/removeRequest/:userId")
   removeJoinRequest(@Param("teamId") teamId: number, @Param("userId") userId: number) {
+    return this.teamService.removeJoinRequest({teamId, userId});
+  }
+
+  @Put("/:teamId/acceptRequest/:userId")
+  acceptJoinRequest(@Param("teamId") teamId: number, @Param("userId") userId: number) {
+    return this.teamService.acceptJoinRequest({teamId, userId});
+  }
+
+  @Put("/:teamId/removeRequest/:userId")
+  rejectJoinRequest(@Param("teamId") teamId: number, @Param("userId") userId: number) {
     return this.teamService.removeJoinRequest({teamId, userId});
   }
 

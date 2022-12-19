@@ -58,6 +58,39 @@ export class TeamService {
     return team;
   }
 
+  async removeMember(teamId: number, userId: number): Promise<Team> {
+    const team = await this.findById(teamId);
+    const targetRemoveUser = await this.userService.findById(userId);
+    
+    const newTeamMembers = [...team.members];
+    const newUserTeams = [...targetRemoveUser.teams];
+    const newTeamLeaders = [...team.leaders];
+
+    const targetRemoveUserIndex = team.members.findIndex((user) => user.id === targetRemoveUser.id);
+    const isUserFound = targetRemoveUserIndex != NOT_FOUND;
+    if (isUserFound) 
+      newTeamMembers.splice(targetRemoveUserIndex, 1);
+    
+    const targetRemoveTeamOnUserIndex = targetRemoveUser.teams.findIndex((team) => team.id === teamId);
+    const isTeamFound = targetRemoveUserIndex != NOT_FOUND;
+    if (isTeamFound) 
+      newUserTeams.splice(targetRemoveTeamOnUserIndex, 1);
+
+    const targetRemoveLeaderIndex = team.leaders.findIndex((user) => user.id === targetRemoveUser.id);
+    const isLeaderFound = targetRemoveUserIndex != NOT_FOUND;
+    if (isLeaderFound) 
+      newTeamLeaders.splice(targetRemoveLeaderIndex, 1);
+    
+    team.members = newTeamMembers;
+    team.leaders = newTeamLeaders;
+    targetRemoveUser.teams = newUserTeams;
+
+    await this.teamRepository.save(team);
+    await this.userService.save(targetRemoveUser);
+
+    return team;
+  }
+
   async findAll(): Promise<Team[]> {
     const teams = await this.teamRepository.find(this.NO_RELATIONS);
 
@@ -164,6 +197,21 @@ export class TeamService {
 
     const updated = await this.findById(requestJoinDto.teamId);
 
+    return updated;
+  }
+
+  async acceptJoinRequest(requestJoinDto: RequestJoinDto): Promise<Team> {
+    const team = await this.findById(requestJoinDto.teamId);
+    
+    const user = await this.userService.findById(requestJoinDto.userId);
+    team.members = [...team.members, user];
+    
+    await this.teamRepository.save(team);
+    
+    this.removeJoinRequest(requestJoinDto);
+    
+    const updated = await this.findById(requestJoinDto.teamId);
+    
     return updated;
   }
 
