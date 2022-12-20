@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
 import { AreaService } from './area.service';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
+import { UpdateLeaderDto } from './dto/update-leader.dto';
 
 @Controller('areas')
 export class AreaController {
@@ -28,6 +29,11 @@ export class AreaController {
   @Get('ofTeam/:teamId')
   findByTeam(@Param('teamId') id: string) {
     return this.areaService.findByTeam(+id);
+  }
+
+  @Put("updateLeader")
+  updateLeader(@Body() updateLeaderDto: UpdateLeaderDto) {
+    return this.areaService.updateLeader(updateLeaderDto);
   }
 
   @Patch(':id')

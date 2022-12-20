@@ -5,6 +5,8 @@ import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
 import { Area } from './entities/area.entity';
 import { TeamService } from '../team/team.service';
+import { UpdateLeaderDto } from './dto/update-leader.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AreaService {
@@ -14,7 +16,9 @@ export class AreaService {
   } };
 
   private readonly RELATIONS = { relations: {
-    columns: true
+    team: false,
+    columns: true,
+    leader: true
   } };
 
   constructor(
@@ -23,6 +27,9 @@ export class AreaService {
 
     @Inject(forwardRef(() => TeamService))
     private readonly teamService: TeamService,
+
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
 
   async create(createAreaDto: CreateAreaDto, teamId: number): Promise<Area> {
@@ -51,9 +58,17 @@ export class AreaService {
   }
 
   async findByTeam(teamId: number): Promise<Area[]> {
+    const areas: Area[] = [];
     const team = await this.teamService.findById(teamId);
 
-    return team.areas;
+    const areasIds = team.areas.map((area) => area.id);
+
+    for (let id of areasIds) {
+      const targetArea = await this.findById(id);
+      areas.push(targetArea);
+    }
+
+    return areas;
   }
 
   async update(id: number, updateAreaDto: UpdateAreaDto): Promise<Area> {
@@ -62,6 +77,24 @@ export class AreaService {
     const updatedArea = await this.findById(id);
 
     return updatedArea;
+  }
+
+  async updateLeader(updateLeaderDto: UpdateLeaderDto): Promise<Area> {
+    const {areaId, userId} = updateLeaderDto;
+
+    const area = await this.findById(areaId);
+
+    const user = await this.userService.findById(userId);
+
+    area.leader = user;
+    user.areasLeadered = [...user.areasLeadered, area];
+
+    await this.areaRepository.save(area);
+    await this.userService.save(user);
+
+    const updated = await this.findById(areaId);
+
+    return updated;
   }
 
   async remove(id: number): Promise<void> {

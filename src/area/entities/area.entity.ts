@@ -1,6 +1,7 @@
 import { ColumnList } from "../../column/entities/column.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Team } from "../../team/entities/team.entity";
+import { User } from "../../user/entities/user.entity";
 
 @Entity()
 export class Area {
@@ -27,7 +28,13 @@ export class Area {
   @Column()
   specialization: string;
 
-  //TODO: leader
+  @ManyToOne(
+    () => User,
+    user => user.areasLeadered,
+    { onDelete: "CASCADE", nullable: true},
+  )
+  leader: User
+
 
   //TODO: team
 }

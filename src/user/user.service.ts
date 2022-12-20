@@ -19,6 +19,7 @@ export class UserService {
   private readonly RELATIONS = { relations: {
     teams: true,
     teamsLeadered: true,
+    areasLeadered: true,
     joinRequests: true
   } };
 

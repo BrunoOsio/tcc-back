@@ -1,4 +1,5 @@
 import { IsEmail } from "class-validator";
+import { Area } from "../../area/entities/area.entity";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Team } from "../../team/entities/team.entity";
 
@@ -39,6 +40,12 @@ export class User {
   @JoinTable({name:"user-joinRequests-team"})
   joinRequests: Team[]
 
+  @OneToMany(
+    () => Area,
+    area => area.leader
+    //{ onDelete: "CASCADE"}
+  )
+  areasLeadered: Area[]
   //TODO: Photo
 }
 
