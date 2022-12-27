@@ -25,5 +25,6 @@ export class Task {
   )
   column: ColumnList
 
-  //TODO: owner
+  @Column({nullable: true})
+  isFinished: boolean;
 }

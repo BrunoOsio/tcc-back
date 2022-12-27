@@ -87,20 +87,26 @@ export class TaskService {
   async update(
     id: number,
     updateTaskDto: UpdateTaskDto,
-    columnId?: number,
+    columnId: number
   ): Promise<Task> {
-    await this.taskRepository.update(id, updateTaskDto);
+    const {title, description, createdAt, limitAt, isFinished} = updateTaskDto;
 
-    const updatedTask = await this.findById(id);
+    const updateTask = await this.findById(id);
+    updateTask.id = id;
+    updateTask.title = title;
+    updateTask.description = description;
+    updateTask.limitAt = limitAt;
+    updateTaskDto.isFinished = isFinished;
+    //TODO: members
 
     if (columnId) {
       const column = await this.columnService.findById(columnId);
-
-      updatedTask.column = column;
-      await this.taskRepository.update(id, updatedTask);
+      updateTask.column = column;
     }
 
-    return updatedTask;
+    const updated = await this.taskRepository.save(updateTask);
+
+    return updated;
   }
 
   async remove(taskId: number): Promise<void> {
