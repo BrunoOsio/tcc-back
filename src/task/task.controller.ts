@@ -35,6 +35,11 @@ export class TaskController {
     return this.taskService.findByColumnId(+columnId);
   }
 
+  @Get('/:id/isExist')
+  isTaskExist(@Param('id') id: string) {
+    return this.taskService.isTaskExist(+id);
+  }
+
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.taskService.findById(+id);

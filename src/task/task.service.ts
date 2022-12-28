@@ -53,7 +53,6 @@ export class TaskService {
     return tasks;
   }
 
-  //!URGERT! reorder the first ever task gives a draggable-id = 1
   async findBiggestId(): Promise<number> {
     let biggestId = 0;
     const tasks = await this.findAll();
@@ -63,6 +62,14 @@ export class TaskService {
     });
 
     return biggestId;
+  }
+
+  async isTaskExist(id: number): Promise<boolean> {
+    const task = await this.taskRepository.findOne({
+      where: { id },
+    });
+
+    return !!task ?? false;
   }
 
   async findById(id: number, relations = false): Promise<Task> {
