@@ -1,6 +1,7 @@
 import { Area } from "../../area/entities/area.entity";
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
+import { Photo } from "../../photo/entities/photo.entity";
 
 @Entity()
 export class Team {
@@ -44,5 +45,12 @@ export class Team {
     //{ onDelete: "CASCADE"}
   )
   joinRequests: User[]
+
+  @ManyToOne(
+    () => Photo,
+    photo => photo.team,
+    {eager: true}
+  )
+  photo: Photo
 }
 

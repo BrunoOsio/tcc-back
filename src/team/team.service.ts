@@ -8,6 +8,7 @@ import { Team } from './entities/team.entity';
 import { isNumber } from "../shared/helpers/string.helpers";
 import { RequestJoinDto } from './dto/request-join.dto';
 import { IsUserOnTeamDto } from './dto/is-user-on-team.dto';
+import { PhotoService } from '../photo/photo.service';
 
 const NOT_FOUND = -1;
 
@@ -20,20 +21,33 @@ export class TeamService {
       areas: true,
       members: true,
       leaders: true,
-      joinRequests: true
+      joinRequests: true,
+      photo: true
     },
   };
 
   constructor(
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
+
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+
+    @Inject(forwardRef(() => PhotoService))
+    private readonly photoService: PhotoService,
   ) {}
 
   async create(createTeamDto: CreateTeamDto, userId: number): Promise<Team> {
+    
     const newTeam = this.teamRepository.create(createTeamDto);
     const leader = await this.userService.findById(userId);
+
+    if (createTeamDto.photo) {
+      const photo = await this.photoService.create(createTeamDto.photo);
+      
+      newTeam.photo = photo;
+    }
+
     newTeam.members = [leader];
     newTeam.leaders = [leader];
 

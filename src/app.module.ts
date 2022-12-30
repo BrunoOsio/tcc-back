@@ -5,6 +5,7 @@ import { TaskModule } from './task/task.module';
 import { AreaModule } from './area/area.module';
 import { TeamModule } from './team/team.module';
 import { UserModule } from './user/user.module';
+import { PhotoModule } from './photo/photo.module';
 import config from "../ormconfig";
 
 @Module({
@@ -14,7 +15,8 @@ import config from "../ormconfig";
     TaskModule, 
     AreaModule, 
     TeamModule,
-    UserModule, 
+    UserModule,
+    PhotoModule, 
   ],
   controllers: [],
   providers: [],
