@@ -9,6 +9,8 @@ import { isNumber } from "../shared/helpers/string.helpers";
 import { RequestJoinDto } from './dto/request-join.dto';
 import { IsUserOnTeamDto } from './dto/is-user-on-team.dto';
 import { PhotoService } from '../photo/photo.service';
+import { UpdatePhotoDto } from 'src/photo/dto/update-photo.dto';
+import { Photo } from 'src/photo/entities/photo.entity';
 
 const NOT_FOUND = -1;
 
@@ -187,7 +189,21 @@ export class TeamService {
   }
 
   async update(id: number, updateTeamDto: UpdateTeamDto): Promise<Team> {
-    await this.teamRepository.update(id, updateTeamDto);
+    const team = await this.findById(id);
+    team.name = updateTeamDto.name;
+    team.modality = updateTeamDto.modality;
+    team.number = updateTeamDto.number;
+
+    if (updateTeamDto.isChangedPhoto) {
+      let photo: Photo | undefined = null;
+
+      if (updateTeamDto.photo)
+        photo = await this.photoService.create(updateTeamDto.photo);
+        
+      team.photo = photo;
+    }
+
+    await this.teamRepository.save(team);
 
     const updatedTeam = await this.findById(id);
 
