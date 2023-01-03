@@ -89,6 +89,7 @@ export class TeamService {
     
     const targetRemoveTeamOnUserIndex = targetRemoveUser.teams.findIndex((team) => team.id === teamId);
     const isTeamFound = targetRemoveUserIndex != NOT_FOUND;
+    
     if (isTeamFound) 
       newUserTeams.splice(targetRemoveTeamOnUserIndex, 1);
 

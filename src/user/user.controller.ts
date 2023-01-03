@@ -28,6 +28,11 @@ export class UserController {
     return this.userService.findByEmail(email);
   }
 
+  @Get(":userId/countLeaderedAreaTasksByTeam/:areaId")
+  countLeaderedAreaTasksByTeam(@Param("userId") userId: string, @Param("areaId") teamId: string) {
+    return this.userService.countLeaderedAreaTasks(+userId, +teamId);
+  }
+
   @Get(":id/teamsLeadered")
   findLeaderedTeams(@Param("id") userId: string) {
     return this.userService.findLeaderedTeams(+userId);

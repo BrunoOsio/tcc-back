@@ -1,13 +1,17 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TeamService } from '../team/team.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { compareValues, hash } from '../shared/helpers/bcrypt.helpers';
 import { UserLoginDto } from './dto/user-login.dto';
-import { Team } from 'src/team/entities/team.entity';
+import { Team } from '../team/entities/team.entity';
+import { ColumnService } from '../column/column.service';
+import { TeamService } from '../team/team.service';
+import { AreaService } from '../area/area.service';
+import { ColumnList } from '../column/entities/column.entity';
+import { AreasInformationsDTO } from 'src/area/dto/areas-informations.dto';
 
 @Injectable()
 export class UserService {
@@ -27,8 +31,14 @@ export class UserService {
     @InjectRepository(User) 
     private readonly userRepository: Repository<User>,
 
+    @Inject(forwardRef(() => ColumnService))
+    private readonly columnService: ColumnService,
+
     @Inject(forwardRef(() => TeamService))
     private readonly teamService: TeamService,
+
+    @Inject(forwardRef(() => AreaService))
+    private readonly areaService: AreaService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -86,6 +96,38 @@ export class UserService {
     const user = await this.findById(userId);
     
     return user.teamsLeadered;
+  }
+
+  async countLeaderedAreaTasks(userId: number, teamId: number): Promise<AreasInformationsDTO> {
+    const user = await this.findById(userId);
+
+    const areas = await this.areaService.findByTeam(teamId);
+
+    const leaderedAreas = areas.filter(area => area.leader?.id === user.id);
+    let leaderedColumns: ColumnList[] = [];
+
+    for (let area of leaderedAreas) {
+      const columns = await this.columnService.findByArea(area.id);
+      const undoneColumns = columns.filter((column) => !column.isForDoneTasks);
+      
+      leaderedColumns = [...leaderedColumns, ...undoneColumns];
+    }
+    
+    const tasksIdsOrder = leaderedColumns.map((column) => column.taskIdsOrder);
+
+    let undoneTasksList: string[] = [];
+
+    tasksIdsOrder.forEach((order) => {
+      
+      const split = order?.split(" ");
+      if (split)
+        undoneTasksList.push(...split);
+    })
+
+    return {
+      areasLeaderedLength: leaderedAreas.length, 
+      undoneTasksLength: undoneTasksList.length
+    };
   }
 
   async save(user: User): Promise<User> {
